@@ -9,6 +9,10 @@ confirmDescription += "\n*Tenative attendance means you are willing to join, but
 
 confirmEmbed = discord.Embed(title="RSVP Confirmation", type="rich", description=confirmDescription)
 
+
+
+
+
 class confirmButton(discord.ui.Button):
     def __init__(self):
         super().__init__(label='Confirm RSVP', style=discord.ButtonStyle.green, row=0)
@@ -22,6 +26,8 @@ class confirmButton(discord.ui.Button):
 
         await interaction.response.edit_message(view=view)
         await interaction.followup.send("Thank you for confirming your attendance to EVENT_TITLE")
+        self.view.value = "confirm"
+        self.view.stop()
 
 
 
@@ -35,9 +41,14 @@ class tenativeButton(discord.ui.Button):
         assert self.view is not None
         view: dmView = self.view
 
-        view.clear_items()
+        for child in view.children:
+            child.disabled=True
+
         await interaction.response.edit_message(view=view)
         await interaction.followup.send("Thank you for confirming your tenative attendance to EVENT_TITLE")
+        self.view.value = "tenative"
+        self.view.stop()
+
 
 
 
@@ -51,9 +62,13 @@ class denyButton(discord.ui.Button):
         assert self.view is not None
         view: dmView = self.view
 
-        view.clear_items()
+        for child in view.children:
+            child.disabled=True
+
         await interaction.response.edit_message(view=view)
         await interaction.followup.send("RSVP for EVENT_TITLE cancelled successfully!")
+        self.view.value = "cancel"
+        self.view.stop()
 
 
 
@@ -62,6 +77,7 @@ class denyButton(discord.ui.Button):
 class dmView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+        self.value = None
 
         self.add_item(confirmButton())
         self.add_item(tenativeButton())
