@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import typing
 import random
+from  rsvp_confirmation import dmView, confirmEmbed
 
 #Variables-----------------
 rsvp_list = [] #List of users that have RSVP'd
@@ -68,8 +69,8 @@ class rsvpButton(discord.ui.Button):
             
         
             await interaction.response.edit_message(view=view)  #Refresh the view to add new names to the RSVP list
-            await interaction.followup.send(f"RSVP Confirmed for {interaction.user.mention}", ephemeral=True) #Sends RSVP confirmation message
-            #await interaction.user.send("Test DM") #replace with method for handling rsvp confirmations/cancellations
+            #await interaction.followup.send(f"RSVP Confirmed for {interaction.user.mention}", ephemeral=True) #Sends RSVP confirmation message
+            await interaction.user.send(view=dmView(), embed=confirmEmbed)
 
         else:
             await interaction.response.send_message(f"{interaction.user.mention} - You have already RSVP'd!", ephemeral=True, delete_after=180) #Sends notice of already being RSVPd
