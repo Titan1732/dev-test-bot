@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
 import typing
-#import random
+import random
 from  rsvp_confirmation import dmView, confirmEmbed
 
 #Variables-----------------
 rsvp_list = [] #List of users that have RSVP'd
+all_views = {}
 
 
 
@@ -52,7 +53,7 @@ class rsvpButton(discord.ui.Button):
         #Variables-----------------
         assert self.view is not None
         view: discordView = self.view
-        user = f"{interaction.user.global_name}"  #Get the user's name who clicked the button  {random.randint(1,1000)}
+        user = f"{interaction.user.global_name}{random.randint(1,1000)}"  #Get the user's name who clicked the button  {random.randint(1,1000)}
 
 
         await interaction.response.defer(ephemeral=False, thinking=False)
@@ -65,7 +66,6 @@ class rsvpButton(discord.ui.Button):
 
 #Handles the RSVP DM Confirmation and RSVP list additions
 async def rsvpHandling(channelView, interaction, user):
-    global rsvp_list
     view = dmView()
 
     if user not in rsvp_list:
@@ -141,6 +141,8 @@ class discordView(discord.ui.View):
         self.add_item(rsvpButton()) 
         self.add_item(timeButton())
         self.add_item(infoButton())
+
+        all_views[id(self)] = self
         
 
 
@@ -183,3 +185,18 @@ class viewSendCog(commands.Cog, name='View'):
                 await ctx.send("Syntax error: `rsvp add|del discordName`")
         else:
                 await ctx.send("Syntax error: `rsvp add|del discordName`")
+
+
+    @commands.command(name="get")
+    async def interact(self, ctx, arg1: typing.Optional[int]):
+        keys = list(all_views.keys())
+        if arg1 is None:
+            await ctx.send(f"Please provide an ID to interact with.\nValid options are {keys}")
+        elif arg1 in all_views:
+            spec_view = all_views.get(arg1)
+
+            await ctx.send(spec_view.children)
+        else:
+            await ctx.send(f"Invalid ID provided.\nValid options are {keys}")
+
+            
